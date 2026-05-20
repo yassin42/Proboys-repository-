@@ -1,0 +1,114 @@
+{
+  "entities": {
+    "Brand": {
+      "title": "Brand",
+      "description": "Mobile phone brand (e.g., Apple, Samsung)",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "iconUrl": { "type": "string" }
+      },
+      "required": ["name"]
+    },
+    "Model": {
+      "title": "Model",
+      "description": "Specific phone model under a brand",
+      "type": "object",
+      "properties": {
+        "brandId": { "type": "string" },
+        "name": { "type": "string" }
+      },
+      "required": ["brandId", "name"]
+    },
+    "InventoryItem": {
+      "title": "InventoryItem",
+      "description": "A specific part or accessory for a phone model",
+      "type": "object",
+      "properties": {
+        "modelId": { "type": "string" },
+        "categoryId": { "type": "string" },
+        "name": { "type": "string" },
+        "price": { "type": "number" },
+        "quantity": { "type": "number" },
+        "compatibilityNote": { "type": "string" },
+        "qrCodeData": { "type": "string" }
+      },
+      "required": ["modelId", "categoryId", "name", "price", "quantity"]
+    },
+    "SalesLog": {
+      "title": "SalesLog",
+      "description": "A record of a sold item",
+      "type": "object",
+      "properties": {
+        "itemId": { "type": "string" },
+        "itemName": { "type": "string" },
+        "categoryId": { "type": "string" },
+        "salePrice": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "stockAtSale": { "type": "number" }
+      },
+      "required": ["itemId", "itemName", "categoryId", "salePrice", "timestamp", "stockAtSale"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Inventory category (e.g., Screen, Case)",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" }
+      },
+      "required": ["name"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Global application settings",
+      "type": "object",
+      "properties": {
+        "storeLogo": { "type": "string" },
+        "storeName": { "type": "string" }
+      }
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "A message in the admin chat room",
+      "type": "object",
+      "properties": {
+        "text": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userPhoto": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["text", "userId", "userName", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/brands/{brandId}": {
+      "schema": "Brand",
+      "description": "Collection of phone brands"
+    },
+    "/models/{modelId}": {
+      "schema": "Model",
+      "description": "Collection of phone models"
+    },
+    "/inventoryItems/{itemId}": {
+      "schema": "InventoryItem",
+      "description": "Collection of stock items"
+    },
+    "/salesLogs/{logId}": {
+      "schema": "SalesLog",
+      "description": "History of sales transactions"
+    },
+    "/categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Customizable list of inventory categories"
+    },
+    "/settings/app": {
+      "schema": "Settings",
+      "description": "Global store configuration"
+    },
+    "/messages/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "Admin chat messages"
+    }
+  }
+}

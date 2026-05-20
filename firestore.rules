@@ -1,0 +1,96 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Entity Validations
+    function isValidBrand(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 100;
+    }
+
+    function isValidModel(data) {
+      return data.name is string && data.name.size() > 0 && data.brandId is string;
+    }
+
+    function isValidInventoryItem(data) {
+      return data.name is string && 
+             data.price is number && data.price >= 0 &&
+             data.quantity is int && data.quantity >= 0 &&
+             data.modelId is string &&
+             data.categoryId is string;
+    }
+
+    function isValidSalesLog(data) {
+      return data.itemId is string &&
+             data.itemName is string &&
+             data.salePrice is number &&
+             data.timestamp is string &&
+             data.stockAtSale is int;
+    }
+
+    function isValidMessage(data) {
+      return data.text is string && data.text.size() > 0 && data.text.size() <= 1000 &&
+             data.userId == request.auth.uid &&
+             data.userName is string &&
+             data.timestamp is string;
+    }
+
+    // Rules
+    match /brands/{brandId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && isValidBrand(incoming());
+    }
+
+    match /models/{modelId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && isValidModel(incoming());
+    }
+
+    match /inventoryItems/{itemId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidInventoryItem(incoming());
+      allow update: if isSignedIn() && isValidInventoryItem(incoming());
+      allow delete: if isSignedIn();
+    }
+
+    match /salesLogs/{logId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidSalesLog(incoming());
+    }
+
+    match /messages/{messageId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidMessage(incoming());
+    }
+
+    match /categories/{categoryId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && (incoming().name is string);
+    }
+
+    match /settings/app {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+  }
+}
